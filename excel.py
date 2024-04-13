@@ -18,15 +18,45 @@ def f_deX( cromosoma ):
 def fitness( fx ):
     return 1 / ( 1 + fx )
 
+def reasignar_cromosomas( grupo_cromosomas ):
+    nuevo_lugar = 0
+    global cromosoma_1, cromosoma_2, cromosoma_3, cromosoma_4, cromosoma_5, cromosoma_6
+
+    for nc in grupo_cromosomas:
+        print(nc)
+        if nuevo_lugar == 0:
+            cromosoma_1 = nc
+        if nuevo_lugar == 1:
+            cromosoma_2 = nc
+        if nuevo_lugar == 2:
+            cromosoma_3 = nc
+        if nuevo_lugar == 3:
+            cromosoma_4 = nc
+        if nuevo_lugar == 4:
+            cromosoma_5 = nc
+        if nuevo_lugar == 5:
+            cromosoma_6 = nc
+            
+        nuevo_lugar += 1
+    
+    print("Nuevos cromosomas1:", cromosoma_1, "\n")
+    print("Nuevos cromosomas2:", cromosoma_2, "\n")
+    print("Nuevos cromosomas3:", cromosoma_3, "\n")
+    print("Nuevos cromosomas4:", cromosoma_4, "\n")
+    print("Nuevos cromosomas5:", cromosoma_5, "\n")
+    print("Nuevos cromosomas6:", cromosoma_6, "\n")
+
 def main():
-    generacion = 0
+    generacion = 1
     global cromosoma_1, cromosoma_2, cromosoma_3, cromosoma_4, cromosoma_5, cromosoma_6
     ratio_mutacion = 0.1
     total_genes = 4*6
 
     mutaciones_totales = math.floor( ratio_mutacion * total_genes )
 
-    while ( generacion <= 50 ):    
+    while ( generacion <= 51 ):
+        print( f"1.- {cromosoma_1}", f"2.- {cromosoma_2}", f"3.- {cromosoma_3}", f"4.- {cromosoma_4}", f"5.- {cromosoma_5}", f"6.- {cromosoma_6}" )
+
         totalFitnesses, acum_suma = 0, 0 
         probabilities, acumulaciones, nuevas_pos, nuevos_cromosomas = [], [], [], []
         num_rand1, num_rand2 = [ random.random() for _ in range( 6 ) ], [ random.random() for _ in range( 6 ) ]
@@ -50,8 +80,7 @@ def main():
         for aptitud in fitnesses:
             totalFitnesses += aptitud
 
-        print( f"Total de fitness de la generación { generacion }: " )
-        print( totalFitnesses, "\n" )
+        print( f"Total de fitness de la generación { generacion }: ", totalFitnesses, "\n" )
 
         for fitness_i in fitnesses:
             probabilities.append( fitness_i / totalFitnesses )
@@ -120,31 +149,7 @@ def main():
 
         print("Nuevos cromosomas:", nuevos_cromosomas, "\n")
 
-        nuevo_lugar = 0
-
-        for nc in nuevos_cromosomas:
-            print(nc)
-            if nuevo_lugar == 0:
-                cromosoma_1 = nc
-            if nuevo_lugar == 1:
-                cromosoma_2 = nc
-            if nuevo_lugar == 2:
-                cromosoma_3 = nc
-            if nuevo_lugar == 3:
-                cromosoma_4 = nc
-            if nuevo_lugar == 4:
-                cromosoma_5 = nc
-            if nuevo_lugar == 5:
-                cromosoma_6 = nc
-            
-            nuevo_lugar += 1
-
-        print("Nuevos cromosomas1:", cromosoma_1, "\n")
-        print("Nuevos cromosomas2:", cromosoma_2, "\n")
-        print("Nuevos cromosomas3:", cromosoma_3, "\n")
-        print("Nuevos cromosomas4:", cromosoma_4, "\n")
-        print("Nuevos cromosomas5:", cromosoma_5, "\n")
-        print("Nuevos cromosomas6:", cromosoma_6, "\n")
+        reasignar_cromosomas( nuevos_cromosomas )
 
         print( "Segundo grupo de numeros random = [ ", end=" " )
         print( " ".join( f"{valor:.3f} " for valor in num_rand2 ), end=" " )
@@ -181,11 +186,39 @@ def main():
             if ncp != 0:
                 print(ncp, index)
 
+        # nuevos_cromosomas_temp = nuevos_cromosomas[:]
+
+        # for index, valor in enumerate(para_crossover):
+        #     if valor != 0:
+        #         cromosoma_1_index = index
+        #         cromosoma_2_index = valor - 1  # Restamos 1 para ajustar al índice de Python
+
+        #         # Cromosomas involucrados en el cruce
+        #         cromosoma_1 = nuevos_cromosomas[cromosoma_1_index]
+        #         cromosoma_2 = nuevos_cromosomas[cromosoma_2_index]
+
+        #         # Puntos de corte
+        #         puntos_de_corte = cp[index]
+
+        #         # Realizar el cruce
+        #         hijo_1 = cromosoma_1[:puntos_de_corte] + cromosoma_2[puntos_de_corte:]
+
+        #         nuevos_cromosomas_temp[cromosoma_1_index + 1] = hijo_1
+
+        #         print("Cruce entre cromosoma", cromosoma_1_index + 1, "y cromosoma", cromosoma_2_index + 1)
+        #         print("Puntos de corte:", puntos_de_corte)
+        #         print("Hijo 1:", hijo_1)
+        #         print()
+
+        # nuevos_cromosomas = nuevos_cromosomas_temp
+
+        # Crear una lista temporal para almacenar los nuevos cromosomas generados durante el cruce
+        nuevos_cromosomas_temp = nuevos_cromosomas[:]
+
         for index, valor in enumerate(para_crossover):
             if valor != 0:
                 cromosoma_1_index = index
                 cromosoma_2_index = valor - 1  # Restamos 1 para ajustar al índice de Python
-                print(cromosoma_1_index, cromosoma_2_index)
 
                 # Cromosomas involucrados en el cruce
                 cromosoma_1 = nuevos_cromosomas[cromosoma_1_index]
@@ -196,13 +229,21 @@ def main():
 
                 # Realizar el cruce
                 hijo_1 = cromosoma_1[:puntos_de_corte] + cromosoma_2[puntos_de_corte:]
-                hijo_2 = cromosoma_2[:puntos_de_corte] + cromosoma_1[puntos_de_corte:]
+
+                # Reemplazar el cromosoma existente con el nuevo cromosoma generado
+                nuevos_cromosomas_temp[cromosoma_1_index] = hijo_1
 
                 print("Cruce entre cromosoma", cromosoma_1_index + 1, "y cromosoma", cromosoma_2_index + 1)
                 print("Puntos de corte:", puntos_de_corte)
                 print("Hijo 1:", hijo_1)
-                print("Hijo 2:", hijo_2)
                 print()
+
+        # Asignar la lista temporal actualizada a nuevos_cromosomas
+        nuevos_cromosomas = nuevos_cromosomas_temp
+
+        print( f"Nuevos cromosomas: {nuevos_cromosomas}" )
+
+        reasignar_cromosomas( nuevos_cromosomas )
         
         pos_mutaciones = [ random.randint( 1, 24 ) for _ in range( mutaciones_totales ) ]
 
@@ -214,6 +255,22 @@ def main():
 
         print("Posicion de las mutaciones: ", pos_mutaciones )
         print( "Nuevos genes despues de la mutacion: ", genes_mutados )
+
+        # Actualizar los nuevos cromosomas con los genes mutados en las posiciones especificadas
+        for i in range(mutaciones_totales):
+            fila = (pos_mutaciones[i] - 1) // 4  # Calcula la fila correspondiente
+            columna = (pos_mutaciones[i] - 1) % 4  # Calcula la columna correspondiente
+            nuevos_cromosomas[fila][columna] = genes_mutados[i]
+
+        # Mostrar los nuevos cromosomas después de la mutación
+        print("\nNuevos cromosomas después de la mutación:")
+        for fila in nuevos_cromosomas:
+            print(fila)
+
+        print("\n")
+
+        reasignar_cromosomas( nuevos_cromosomas )
+
 
         generacion += 1 
         

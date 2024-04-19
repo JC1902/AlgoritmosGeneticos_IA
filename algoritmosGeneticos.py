@@ -32,9 +32,21 @@ class Agente:
             'ataque': (self.ataque + partner.ataque) / 2,
             'defensa': (self.defensa + partner.defensa) / 2,
             'resistencia': (self.resistencia + partner.resistencia) / 2,
-            'agilidad': (self.agilidad + partner.agilidad) / 2
+            'agilidad': (self.agilidad + partner.agilidad) / 2,
+            'nombre' : ( self.nombre )
         }
         return Agente(**child_genes)  # Crear un nuevo agente con los genes del hijo
+#-----------------------------------------------------------------------------------
+    def setNombre( self, nombre ) :
+        self.nombre = nombre
+#-----------------------------------------------------------------------------------
+    def status( self ) :
+        print( "{} su fuerza es: {}".format( self.nombre, self.fuerza ) )
+        print( "{} su ataque es: {}".format( self.nombre, self.ataque ) )
+        print( "{} su defensa es: {}".format( self.nombre, self.defensa ) )
+        print( "{} su agilidad es: {}".format( self.nombre, self.agilidad ) )
+        print( "{} su resistencia es: {}".format( self.nombre, self.resistencia ) )
+        print( "============================================")
 #-----------------------------------------------------------------------------------
 class AlgoritmoGenetico:
     def __init__(self, poblacion_size):
@@ -58,10 +70,12 @@ class AlgoritmoGenetico:
             # Turno del agente 1
             daño_agente1 = agente1.atacar()
             agente2.recibir_ataque(daño_agente1)
+            print( "{} recibio {} de daño".format( agente2.nombre, daño_agente1 ) )
             
             # Turno del agente 2
             daño_agente2 = agente2.atacar()
             agente1.recibir_ataque(daño_agente2)
+            print( "{} recibio {} de daño".format( agente1.nombre, daño_agente2 ) )
 
         if agente1.vida <= 0:
             return agente2
@@ -102,6 +116,9 @@ class AlgoritmoGenetico:
 
             # Incrementar el número de generaciones
             num_generaciones += 1
+            print( "Generacion {}".format( num_generaciones ) )
+            hijo1.status()
+            hijo2.status()
 
         return num_generaciones
 #-----------------------------------------------------------------------------------
@@ -113,6 +130,11 @@ print("Número total de generaciones:", num_generaciones)
 # Seleccionar dos agentes para el combate
 agente1 = algoritmo.poblacion[0]
 agente2 = algoritmo.poblacion[1]
+
+agente1.setNombre( "Pikachu " )
+agente2.setNombre( "MOK" )
+
+#agente1.status( "Agente 1" )
 
 # Simular combate entre los dos agentes
 ganador = algoritmo.simular_combate(agente1, agente2)

@@ -35,11 +35,15 @@ class Agente:
              'agilidad': (self.agilidad + partner.agilidad) / 2,
         }
             return Agente(**child_genes)  # Crear un nuevo agente con los genes del hijo
-
-        #def crossover( self, partner, puntosDeCorte ):
-            #child_genes = {
-
-            #}
+#-----------------------------------------------------------------------------------
+    def mutar(self, probabilidad_mutacion):
+            if random.random() < probabilidad_mutacion:
+                # Si la probabilidad de mutación se cumple, muta un gen aleatorio
+                genes = ['fuerza', 'vida', 'ataque', 'defensa', 'resistencia', 'agilidad']
+                gen_a_mutar = random.choice(genes)
+                nuevo_valor = random.randint(1, 10)  # Nuevo valor aleatorio para el gen mutado
+                print( "Si muto" )
+                setattr(self, gen_a_mutar, nuevo_valor)
 #-----------------------------------------------------------------------------------
     def status( self, nombre ) :
         print( "{} su vida es de: {}".format( nombre, self.vida ) )
@@ -73,18 +77,21 @@ class AlgoritmoGenetico:
         #agente2.status( "Agente 2" )
         while a1.vida > 0 and a2.vida > 0:
             # Turno del agente 1
-            daño_agente1 = a1.atacar()
-            a2.recibir_ataque(daño_agente1)
-            print( "Agente 2 recibio {} de daño".format( daño_agente1 ) )
-            print ( "La vida del agente 2 es de: {}".format( a2.vida ))
+            if a2.vida >= 0 :
+                daño_agente1 = a1.atacar()
+                a2.recibir_ataque(daño_agente1)
+                print( "Agente 2 recibio {} de daño".format( daño_agente1 ) )
+                print ( "La vida del agente 2 es de: {}".format( a2.vida ))
+            else:
+                break
             
             # Turno del agente 2
-            daño_agente2 = a2.atacar()
-            a1.recibir_ataque(daño_agente2)
-            print( "Agente 1 recibio {} de daño".format( daño_agente2 ) )
-            print ( "La vida del agente 2 es de: {}".format( a1.vida ))
-
-            if a1.vida <= 0 or a2.vida <= 0:
+            if a1.vida >= 0:
+                daño_agente2 = a2.atacar()
+                a1.recibir_ataque(daño_agente2)
+                print( "Agente 1 recibio {} de daño".format( daño_agente2 ) )
+                print ( "La vida del agente 2 es de: {}".format( a1.vida ))
+            else:
                 break
 
         if a1.vida <= 0:
@@ -128,8 +135,11 @@ class AlgoritmoGenetico:
                 padre1, padre2 = self.seleccionar_padres()
 
                 hijo1 = padre1.crossover(padre2)
-                hijo1.status("Hijo 1")
+                
                 padre1.status( "padre 2")
+                hijo1.status("Hijo 1")
+
+                hijo1.mutar(random.random())
 
                 self.poblacion.extend([hijo1])
 

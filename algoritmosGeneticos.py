@@ -26,26 +26,29 @@ class Agente:
 #-----------------------------------------------------------------------------------
     def crossover(self, partner):
         # Realizar el crossover para generar un nuevo agente hijo
-        child_genes = {
-            'fuerza': (self.fuerza + partner.fuerza) / 2,
-            'vida': (self.vida + partner.vida) / 2,
-            'ataque': (self.ataque + partner.ataque) / 2,
-            'defensa': (self.defensa + partner.defensa) / 2,
-            'resistencia': (self.resistencia + partner.resistencia) / 2,
-            'agilidad': (self.agilidad + partner.agilidad) / 2,
-            'nombre' : ( self.nombre )
+            child_genes = {
+               'fuerza': (self.fuerza + partner.fuerza) / 2,
+                 'vida': 100,
+               'ataque': (self.ataque + partner.ataque) / 2,
+              'defensa': (self.defensa + partner.defensa) / 2,
+          'resistencia': (self.resistencia + partner.resistencia) / 2,
+             'agilidad': (self.agilidad + partner.agilidad) / 2,
         }
-        return Agente(**child_genes)  # Crear un nuevo agente con los genes del hijo
+            return Agente(**child_genes)  # Crear un nuevo agente con los genes del hijo
+
+        #def crossover( self, partner, puntosDeCorte ):
+            #child_genes = {
+
+            #}
 #-----------------------------------------------------------------------------------
-    def setNombre( self, nombre ) :
-        self.nombre = nombre
-#-----------------------------------------------------------------------------------
-    def status( self ) :
-        print( "{} su fuerza es: {}".format( self.nombre, self.fuerza ) )
-        print( "{} su ataque es: {}".format( self.nombre, self.ataque ) )
-        print( "{} su defensa es: {}".format( self.nombre, self.defensa ) )
-        print( "{} su agilidad es: {}".format( self.nombre, self.agilidad ) )
-        print( "{} su resistencia es: {}".format( self.nombre, self.resistencia ) )
+    def status( self, nombre ) :
+        print( "{} su vida es de: {}".format( nombre, self.vida ) )
+        print( "{} su fuerza es: {}".format( nombre, self.fuerza ) )
+        print( "{} su ataque es: {}".format( nombre, self.ataque ) )
+        print( "{} su defensa es: {}".format( nombre, self.defensa ) )
+        print( "{} su agilidad es: {}".format( nombre, self.agilidad ) )
+        print( "{} su resistencia es: {}".format( nombre, self.resistencia ) )
+        print( "{} su fitness es: {}".format( nombre, self.fitness ) )
         print( "============================================")
 #-----------------------------------------------------------------------------------
 class AlgoritmoGenetico:
@@ -65,22 +68,31 @@ class AlgoritmoGenetico:
             agente = Agente(fuerza, vida, ataque, defensa, resistencia, agilidad)
             self.poblacion.append(agente)
 #-----------------------------------------------------------------------------------
-    def simular_combate(self, agente1, agente2):
-        while agente1.vida > 0 and agente2.vida > 0:
+    def simular_combate(self, a1, a2):
+        #agente1.status( "Agente 1" )
+        #agente2.status( "Agente 2" )
+        while a1.vida > 0 and a2.vida > 0:
             # Turno del agente 1
-            daño_agente1 = agente1.atacar()
-            agente2.recibir_ataque(daño_agente1)
-            print( "{} recibio {} de daño".format( agente2.nombre, daño_agente1 ) )
+            daño_agente1 = a1.atacar()
+            a2.recibir_ataque(daño_agente1)
+            print( "Agente 2 recibio {} de daño".format( daño_agente1 ) )
+            print ( "La vida del agente 2 es de: {}".format( a2.vida ))
             
             # Turno del agente 2
-            daño_agente2 = agente2.atacar()
-            agente1.recibir_ataque(daño_agente2)
-            print( "{} recibio {} de daño".format( agente1.nombre, daño_agente2 ) )
+            daño_agente2 = a2.atacar()
+            a1.recibir_ataque(daño_agente2)
+            print( "Agente 1 recibio {} de daño".format( daño_agente2 ) )
+            print ( "La vida del agente 2 es de: {}".format( a1.vida ))
 
-        if agente1.vida <= 0:
-            return agente2
+            if a1.vida <= 0 or a2.vida <= 0:
+                break
+
+        if a1.vida <= 0:
+            #print( "Agente 1 a muerto" )
+            return a2
         else:
-            return agente1
+            #print( "Agente 2 a muerto" )
+            return a1
 #-----------------------------------------------------------------------------------
     def calcular_fitness(self):
         # Simular combate entre cada par de agentes en la población
@@ -89,10 +101,13 @@ class AlgoritmoGenetico:
                 resultado = self.simular_combate(self.poblacion[i], self.poblacion[j])
 
                 # Calcular el fitness basado en el resultado del combate
-                if resultado == self.poblacion[i]:
+                if resultado == self.poblacion[i] :
                     self.poblacion[i].fitness += 1
+                    
                 else:
                     self.poblacion[j].fitness += 1
+                    
+
 #-----------------------------------------------------------------------------------
     def seleccionar_padres(self):
         # Seleccionar dos padres aleatorios basados en el fitness
@@ -109,33 +124,45 @@ class AlgoritmoGenetico:
 
             # Seleccionar dos padres y realizar crossover para crear nuevos hijos
             for _ in range(self.poblacion_size // 2):
+                print( "Generacion {}".format( num_generaciones ) )
                 padre1, padre2 = self.seleccionar_padres()
+
                 hijo1 = padre1.crossover(padre2)
-                hijo2 = padre2.crossover(padre1)
-                self.poblacion.extend([hijo1, hijo2])
+                hijo1.status("Hijo 1")
+                padre1.status( "padre 2")
+
+                self.poblacion.extend([hijo1])
 
             # Incrementar el número de generaciones
             num_generaciones += 1
-            print( "Generacion {}".format( num_generaciones ) )
-            hijo1.status()
-            hijo2.status()
-
+            print ( "La pobalcion actiual es de: {}".format(len(self.poblacion) ))
+                    
         return num_generaciones
+#-----------------------------------------------------------------------------------
+    def masApto( self ):
+        self.poblacion = [agente for agente in self.poblacion if agente.vida > 0]
+
+        if self.poblacion == 2 :
+            self.algoritmoGenetico(10)
+        else:
+            print("Son putos todos")
 #-----------------------------------------------------------------------------------
 # Uso del algoritmo genético para simular combates entre dos agentes
 algoritmo = AlgoritmoGenetico(poblacion_size=10)
 num_generaciones = algoritmo.algoritmo_genetico(10)
 print("Número total de generaciones:", num_generaciones)
 
+algoritmo.masApto()
+print ( "La pobalcion actiual es de: {}".format(len(algoritmo.poblacion) ))
 # Seleccionar dos agentes para el combate
-agente1 = algoritmo.poblacion[0]
-agente2 = algoritmo.poblacion[1]
+agente1 = algoritmo.poblacion[ random.randint( 0, len( algoritmo.poblacion ) - 1 ) ]
+agente2 = algoritmo.poblacion[ random.randint( 0, len( algoritmo.poblacion ) - 1 ) ]
 
-agente1.setNombre( "Pikachu " )
-agente2.setNombre( "MOK" )
 
-#agente1.status( "Agente 1" )
 
 # Simular combate entre los dos agentes
 ganador = algoritmo.simular_combate(agente1, agente2)
 print("El ganador es el agente con {} de vida restante.".format(ganador.vida))
+
+agente1.status( "Agente1" )
+agente2.status( "Agente2" )

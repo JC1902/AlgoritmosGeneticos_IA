@@ -9,6 +9,9 @@ RATIO_MUTACION = 0.1
 def f_deX(cromosoma):
     return sum((i + 1) * valor for i, valor in enumerate(cromosoma)) - 30
 
+def evaluar(cromosoma):
+    return sum((i + 1) * valor for i, valor in enumerate(cromosoma))
+
 def fitness(fx):
     return 1 / (1 + fx)
 
@@ -57,7 +60,7 @@ def seleccionar_mejor_cromosoma(cromosomas):
     mejor_valor = float('inf')  # Inicializar con infinito para encontrar el más cercano a 0
 
     for cromosoma in cromosomas:
-        valor = abs(f_deX(cromosoma))
+        valor = abs(evaluar(cromosoma))
         if valor < mejor_valor:
             mejor_valor = valor
             mejor_cromosoma = cromosoma
@@ -102,7 +105,7 @@ def main():
         generacion += 1
         
         mejor_cromosoma = seleccionar_mejor_cromosoma(cromosomas)
-        valor_objetivo = f_deX(mejor_cromosoma)
+        valor_objetivo = evaluar(mejor_cromosoma)
         if valor_objetivo == 30:
             print("¡Se encontró un cromosoma con un valor de función objetivo de 30!")
             print("Mejor cromosoma:", mejor_cromosoma)

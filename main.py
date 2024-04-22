@@ -155,8 +155,8 @@ def animate_voltorb():
         voltorb_animation_counter = 0
         
 # Establece las posiciones de los enemigos
-posiciones_muk = [ ( random.randrange( 1, 9 ), random.randrange( 1, 9 ) ) for _ in range( 2 )]
-posiciones_voltorb = [ ( random.randrange( 1, 9 ), random.randrange( 1, 9 ) ) for _ in range( 2 )]
+posiciones_muk = [ ( random.randrange( 0, 9 ), random.randrange( 0, 9 ) ) for _ in range( 2 )]
+posiciones_voltorb = [ ( random.randrange( 0, 9 ), random.randrange( 0, 9 ) ) for _ in range( 2 )]
 
 # Funcion la cual coloca los enemigos en el mapa
 def colocar_enemigos( posiciones_enemigos, posiciones_colectables, frame_enemigo, enemigo_images ):
@@ -279,7 +279,7 @@ def contacto_enemigo( x , y ):
 def reiniciar_juego():
     
     frame = 0
-    
+    mapaJuego = best_solution
     posiciones_personaje = [ ( 1,1 ), ( 1,8 ), ( 8,1 ), ( 8,8 ) ] 
     pos_personaje_x, pos_personaje_y = random.choice( posiciones_personaje )
 
@@ -288,6 +288,7 @@ def reiniciar_juego():
     screen.fill( FONDO )
     draw_map( mapaJuego )
     colocar( posiciones_coleccionables )
+
     colocar_enemigos( posiciones_muk, posiciones_coleccionables, frame_index_muk, muk )
     colocar_enemigos( posiciones_voltorb, posiciones_coleccionables, frame_index_voltorb, voltorb )
     personaje_ancho, personaje_alto = CELL_SIZE // 1.5, CELL_SIZE // 1.5 
@@ -578,8 +579,9 @@ def main():
             posiciones_personaje = [ ( 1,1 ), ( 1,8 ), ( 8,1 ), ( 8,8 ) ]
             
             pos_personaje_x, pos_personaje_y = random.choice( posiciones_personaje ) 
-            nodo_jugador=algoritoAEstrella.Nodo( pos_personaje_x, pos_personaje_y )     
-            posiciones_coleccionables = [ ( random.randrange( 1, 9 ), random.randrange( 1, 9 ) ) for _ in range( 10 ) ]
+            nodo_jugador=algoritoAEstrella.Nodo( pos_personaje_x, pos_personaje_y )   
+
+            posiciones_coleccionables = [ ( random.randrange( 0, 9 ), random.randrange( 0, 9 ) ) for _ in range( 10 ) ]
             colocar( posiciones_coleccionables )
             costo = 0
             camino_a_pila = []

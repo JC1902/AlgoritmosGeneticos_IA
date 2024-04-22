@@ -1,6 +1,20 @@
 import random
 import numpy as np
 
+# Matriz inicial
+initial_matrix = np.array([
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 2, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 3, 0, 0, 2, 0, 1],
+    [1, 0, 3, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 2, 2, 0, 2, 0, 1],
+    [1, 0, 3, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 2, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 2, 0, 0, 0, 2, 0, 3, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+])
+
 # Matriz objetivo
 target_matrix = np.array([
     [3, 5, 1, 1, 1, 6, 6, 1, 1, 5],
@@ -16,10 +30,9 @@ target_matrix = np.array([
 ])
 
 # Parámetros del algoritmo genético
-mutation_rate = 0.01
-generations = 1000
-max_generations_without_improvement = 100
-population_size = 100
+mutation_rate = 0.05
+population_size = 200
+max_generations_without_improvement = 200
 
 def fitness(individual):
     return np.sum(individual == target_matrix)
@@ -34,7 +47,15 @@ def roulette_selection(population, fitness_values):
             return ind
 
 def create_individual():
-    return np.random.randint(1, 11, size=target_matrix.shape)
+    return initial_matrix.copy()
+
+def mutate(individual):
+    mutated_individual = individual.copy()
+    for i in range(mutated_individual.shape[0]):
+        for j in range(mutated_individual.shape[1]):
+            if random.random() < mutation_rate:
+                mutated_individual[i][j] = random.randint(1, 10)
+    return mutated_individual
 
 # Algoritmo genético
 current_matrix = create_individual()
@@ -42,10 +63,10 @@ current_matrix = create_individual()
 best_fitness = 0
 generations_without_improvement = 0
 
-for generation in range(generations):
+while True:
     current_fitness = fitness(current_matrix)
     if current_fitness == np.prod(current_matrix.shape):
-        print("Solución encontrada en la generación:", generation)
+        print("Solución encontrada.")
         break
 
     if current_fitness > best_fitness:
@@ -62,14 +83,10 @@ for generation in range(generations):
     next_population = [best_solution.copy()]  # Elitismo, la mejor solución pasa directamente
     while len(next_population) < population_size:
         selected_individual = roulette_selection([current_matrix], [current_fitness])
-        new_individual = selected_individual.copy()
-        for i in range(new_individual.shape[0]):
-            for j in range(new_individual.shape[1]):
-                if random.random() < mutation_rate:
-                    new_individual[i][j] = random.randint(1, 10)
+        new_individual = mutate(selected_individual)
         next_population.append(new_individual)
 
-    current_matrix = next_population[random.randint(0, population_size - 1)]  # Seleccionamos aleatoriamente una de las nuevas soluciones
+    current_matrix = roulette_selection(next_population, [fitness(ind) for ind in next_population])  # Utilizamos la selección de ruleta para todos los padres
 
 best_solution = current_matrix
 print("Mejor solución encontrada:")

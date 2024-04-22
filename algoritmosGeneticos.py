@@ -155,7 +155,7 @@ class AlgoritmoGenetico:
         if len( self.poblacion ) <= 2 :
             self.algoritmoGenetico(10)
         else:
-            print("Son putos todos")
+            print("No hay algun individuo más apto")
 #-----------------------------------------------------------------------------------
 # Uso del algoritmo genético para simular combates entre dos agentes
 algoritmo = AlgoritmoGenetico(poblacion_size=10)

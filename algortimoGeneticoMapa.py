@@ -84,6 +84,8 @@ while True:
     while len(next_population) < population_size:
         selected_individual = roulette_selection([current_matrix], [current_fitness])
         new_individual = mutate(selected_individual)
+        # Reemplazar los ceros con valores aleatorios
+        new_individual[new_individual == 0] = random.randint(1, 10)
         next_population.append(new_individual)
 
     current_matrix = roulette_selection(next_population, [fitness(ind) for ind in next_population])  # Utilizamos la selección de ruleta para todos los padres

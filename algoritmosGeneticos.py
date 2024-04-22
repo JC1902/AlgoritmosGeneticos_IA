@@ -152,7 +152,7 @@ class AlgoritmoGenetico:
     def masApto( self ):
         self.poblacion = [agente for agente in self.poblacion if agente.vida > 0]
 
-        if self.poblacion == 2 :
+        if len( self.poblacion ) <= 2 :
             self.algoritmoGenetico(10)
         else:
             print("Son putos todos")

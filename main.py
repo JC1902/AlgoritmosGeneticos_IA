@@ -6,6 +6,7 @@ import time
 from interfaz import Interfaz ,BATERIA_MAX , VIDAS_MAX , Button
 import numpy as np 
 import math
+from algoritmosGeneticos import Agente as personaje, AlgoritmoGenetico as ag
 
 
 # Inicialización de Pygame
@@ -49,10 +50,22 @@ posiciones_personaje = [ ( 1,1 ), ( 1,8 ), ( 8,1 ), ( 8,8 ) ]
 pos_personaje_x, pos_personaje_y = random.choice( posiciones_personaje )
 nodo_jugador = algoritoAEstrella.Nodo( pos_personaje_x, pos_personaje_y )
 
+#Inicialiazcion de agentes
+algoritmo = ag( poblacion_size = 10)
+num_generaciones = algoritmo.algoritmo_genetico( 10 )
+algoritmo.masApto()
 
+pikachu = algoritmo.poblacion[ random.randint( 0, len( algoritmo.poblacion ) - 1 ) ]
+
+enemigo = algoritmo.poblacion[ random.randint( 0, len( algoritmo.poblacion ) - 1 ) ]
+
+pikachu.status( "Pikachu" )
+enemigo.status( "Enmigo" )
+
+en_pelea = False
+
+print( "La poblacion actual es de: {}".format( len( algoritmo.poblacion ) ) )
 #-------------------------------------------------------------------------
-
-
 NUM_CROMOSOMAS = 10
 GENES_POR_CROMOSOMA = 10
 TOTAL_GENES = NUM_CROMOSOMAS * GENES_POR_CROMOSOMA
@@ -132,7 +145,7 @@ def seleccionar_mejores_cromosomas(cromosomas):
 
 print("Mejor cromosoma:", seleccionar_mejores_cromosomas( generar_cromosomas_iniciales() ) )
 
-mapaJuego = seleccionar_mejores_cromosomas( generar_cromosomas_iniciales() )
+#mapaJuego = seleccionar_mejores_cromosomas( generar_cromosomas_iniciales() )
 
 def algoritmo_genetico():
     cromosomas = generar_cromosomas_iniciales()
@@ -148,7 +161,8 @@ def algoritmo_genetico():
     return mejores_cromosomas
 
 # Ejemplo de uso del algoritmo genético
-mapaJuego = mejores_cromosomas = algoritmo_genetico()
+mejores_cromosomas = algoritmo_genetico()
+#mapaJuego = mejores_cromosomas = algoritmo_genetico()
 for cromosoma in mejores_cromosomas:
     print(f_deX(cromosoma))
 
@@ -326,12 +340,28 @@ def recolectar_coleccionables( x , y ):
 
 # Comprueba colicion con enemigo
 def contacto_enemigo( x , y ):
+    global en_pelea
+    global ganador 
     pos_enemigos = posiciones_muk + posiciones_voltorb
     posicion_pj = ( x , y )
     i = 10
     for posicion in pos_enemigos :
         
         if posicion == posicion_pj :
+            en_pelea = True
+            ganador = algoritmo.simular_combate( pikachu, enemigo )
+
+            if ganador ==  pikachu :
+                print( "Felicidades has ganado !!!" )
+                interfaz.dibujar_texto( screen, " Felicidades has ganado!!!",300, 400)
+                en_pelea = False
+                
+                
+            else:
+                print( "Oh no has perdido !!")
+                interfaz.dibujar_texto( screen, " Oh no has perdido!!",300, 400)
+                en_pelea = False
+
             return True
         i = i + 20
 
@@ -387,6 +417,9 @@ def main():
     costo = 0  
     running = True
 
+    global en_pelea
+    global ganador 
+
     #mapa_optimizado = algoritmo_genetico( posiciones_coleccionables )
     #print ( mapa_optimizado )
 
@@ -402,8 +435,15 @@ def main():
             pygame.display.update()
         # Se comprueba si tuvo un contacto con el enemigo
         if contacto_enemigo( pos_personaje_x , pos_personaje_y ) :
-            vidas = vidas -1  if vidas > 0 else 0
-            
+            if ganador != pikachu:
+                vidas = vidas -1  if vidas > 0 else 0
+
+            pikachu.status( "Pikachu" )
+            enemigo.status( "Enemigo" )
+                      
+
+        if en_pelea:
+            continue
         # Determina si el boton de inicio fue presionado y comienza el movimiento
         
         if( movimiento_on == True and ruta_optima is not None and len( ruta_optima ) !=0 and len( ruta_optima ) > 0):
@@ -543,7 +583,6 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
             
 
         # Dibujar el mapa del juego
@@ -637,7 +676,6 @@ def main():
             se_esta_recargando = False
             ruta_optima = []
             vidas = VIDAS_MAX
-            
         
         # Actualiza el juego
         pygame.display.update()

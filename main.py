@@ -278,6 +278,7 @@ def contacto_enemigo( x , y ):
 # Funcion la cual reinicia el juego
 def reiniciar_juego():
     
+    global posiciones_muk, posiciones_voltorb
     frame = 0
     mapaJuego = best_solution
     posiciones_personaje = [ ( 1,1 ), ( 1,8 ), ( 8,1 ), ( 8,8 ) ] 
@@ -297,6 +298,12 @@ def reiniciar_juego():
     
     bayas_pos_x = 4 * CELL_SIZE
     bayas_pos_y = 8 * CELL_SIZE
+
+    posiciones_muk = [ ( random.randrange( 0, 9 ), random.randrange( 0, 9 ) ) for _ in range( 2 )]
+    posiciones_voltorb = [ ( random.randrange( 0, 9 ), random.randrange( 0, 9 ) ) for _ in range( 2 )]
+    colocar_enemigos( posiciones_muk, posiciones_coleccionables, frame_index_muk, muk )
+    colocar_enemigos( posiciones_voltorb, posiciones_coleccionables, frame_index_voltorb, voltorb )
+
     screen.blit( personajes[ direccion ][ frame ], ( personaje_pos_x, personaje_pos_y ) )
     screen.blit( bayas[ frame_index_bayas ], (bayas_pos_x, bayas_pos_y) ) 
     pygame.display.update()

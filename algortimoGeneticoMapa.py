@@ -80,7 +80,7 @@ while True:
         print("Se alcanzó el límite de generaciones sin mejora.")
         break
 
-    next_population = [best_solution.copy()]  # Elitismo, la mejor solución pasa directamente
+    next_population = [best_solution.copy()]  
     while len(next_population) < population_size:
         selected_individual = roulette_selection([current_matrix], [current_fitness])
         new_individual = mutate(selected_individual)

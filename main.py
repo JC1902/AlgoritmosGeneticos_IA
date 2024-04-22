@@ -7,6 +7,7 @@ from interfaz import Interfaz ,BATERIA_MAX , VIDAS_MAX , Button
 import numpy as np 
 import math
 from algoritmosGeneticos import Agente as personaje, AlgoritmoGenetico as ag
+from algortimoGeneticoMapa import best_solution
 
 
 # Inicialización de Pygame
@@ -45,6 +46,8 @@ mapaJuego = [
     [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ]
 ]
 
+mapaJuego = best_solution
+
 # Posiciones posible para el personaje
 posiciones_personaje = [ ( 1,1 ), ( 1,8 ), ( 8,1 ), ( 8,8 ) ]
 pos_personaje_x, pos_personaje_y = random.choice( posiciones_personaje )
@@ -65,25 +68,6 @@ enemigo.status( "Enmigo" )
 en_pelea = False
 
 print( "La poblacion actual es de: {}".format( len( algoritmo.poblacion ) ) )
-#-------------------------------------------------------------------------
-
-def generar_cromosomas_iniciales():
-    return [
-        [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
-        [ 1, 0, 0, 0, 2, 0, 0, 0, 0, 1 ],
-        [ 1, 0, 0, 0, 3, 0, 0, 2, 0, 1 ],
-        [ 1, 0, 3, 0, 0, 0, 0, 0, 0, 1 ],
-        [ 1, 0, 0, 0, 2, 2, 0, 2, 0, 1 ],
-        [ 1, 0, 3, 0, 0, 0, 0, 0, 0, 1 ],
-        [ 1, 0, 2, 0, 0, 0, 0, 0, 0, 1 ],
-        [ 1, 0, 2, 0, 0, 0, 2, 0, 3, 1 ],
-        [ 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ],
-        [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ]
-    ]
-
-
-#-------------------------------------------------------------------------
-
 
 # Dirección inicial del personaje
 if ( pos_personaje_x, pos_personaje_y ) == ( 1,1 ) or ( pos_personaje_x, pos_personaje_y ) == ( 8,1 ):
@@ -202,29 +186,28 @@ tipo_piso = []
 
 index_pisos = 0
 
-# Intercambia los 0 por diferentes numeros, para agregar diferente tipo de suelo
-for y, row in enumerate( mapaJuego ):
-        for x, cell in enumerate( row ):
-            if cell == 0:
-                piso = random.choice( [ tierra, tierra, pasto, lodo ] )
-                tipo_piso.append( piso )
+# # Intercambia los 0 por diferentes numeros, para agregar diferente tipo de suelo
+# for y, row in enumerate( mapaJuego ):
+#         for x, cell in enumerate( row ):
+#             if cell == 0:
+#                 piso = random.choice( [ tierra, tierra, pasto, lodo ] )
+#                 tipo_piso.append( piso )
                 
 
 
-for y, row in enumerate( mapaJuego ):
-    for x, cell in enumerate( row ):
-        if cell == 0:
-            if tipo_piso[ index_pisos ] == tierra:
-                mapaJuego[ y ][ x ] = 4
+# for y, row in enumerate( mapaJuego ):
+#     for x, cell in enumerate( row ):
+#         if cell == 0:
+#             if tipo_piso[ index_pisos ] == tierra:
+#                 mapaJuego[ y ][ x ] = 4
             
-            if tipo_piso[ index_pisos ] == pasto:
-                mapaJuego[ y ][ x ] = 5
+#             if tipo_piso[ index_pisos ] == pasto:
+#                 mapaJuego[ y ][ x ] = 5
 
-            if tipo_piso[ index_pisos ] == lodo:
-                mapaJuego[ y ][ x ] = 6
+#             if tipo_piso[ index_pisos ] == lodo:
+#                 mapaJuego[ y ][ x ] = 6
         
-            index_pisos += 1
-
+#             index_pisos += 1
 
 # Función para dibujar el mapa del juego
 def draw_map( mapa ):
@@ -246,6 +229,14 @@ def draw_map( mapa ):
                 screen.blit( pasto, ( x * CELL_SIZE, y * CELL_SIZE ) )
             if cell == 6:
                 screen.blit( lodo, ( x * CELL_SIZE, y * CELL_SIZE ) )
+            if cell == 7:
+                screen.blit( esquina_inf_der, ( x * CELL_SIZE, y * CELL_SIZE ) )
+            if cell == 8:          
+                screen.blit( esquina_inf_izq, ( x * CELL_SIZE, y * CELL_SIZE ) )
+            if cell == 9:
+                screen.blit( esquina_sup_der, ( x * CELL_SIZE, y * CELL_SIZE ) )
+            if cell == 10:            
+                screen.blit( esquina_sup_izq, ( x * CELL_SIZE, y * CELL_SIZE ) )
 
 
 # Elimina el colecionable si esta en la posicion del pj
@@ -490,6 +481,8 @@ def main():
                 costo += 3
             elif mapaJuego[ pos_personaje_x ][ pos_personaje_y ] == 4:
                 costo += 2
+            elif mapaJuego[ pos_personaje_x ][ pos_personaje_y ] == 7 or mapaJuego[ pos_personaje_x ][ pos_personaje_y ] == 8 or mapaJuego[ pos_personaje_x ][ pos_personaje_y ] == 9 or mapaJuego[ pos_personaje_x ][ pos_personaje_y ] == 10:
+                costo += 4
             else:
                 costo += 1
            

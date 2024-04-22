@@ -27,6 +27,16 @@ arbol_tierra = pygame.transform.scale( arbol_tierra, ( CELL_SIZE, CELL_SIZE ) )
 snorlax_tierra = [ pygame.image.load( f'obstaculos/snorlax_{i}.png') for i in range( 5 ) ]
 snorlax_tierra = [pygame.transform.scale( imagen, ( CELL_SIZE, CELL_SIZE ) ) for imagen in snorlax_tierra ]
 
+esquina_inf_der = pygame.image.load( 'pisos/esquina_inf_der.png' )
+esquina_inf_izq = pygame.image.load( 'pisos/esquina_inf_izq.png' )
+esquina_sup_der = pygame.image.load( 'pisos/esquina_sup_der.png' )
+esquina_sup_izq = pygame.image.load( 'pisos/esquina_sup_izq.png' )
+
+esquina_inf_der = pygame.transform.scale( esquina_inf_der, ( CELL_SIZE, CELL_SIZE ) )
+esquina_inf_izq = pygame.transform.scale( esquina_inf_izq, ( CELL_SIZE, CELL_SIZE ) )
+esquina_sup_der = pygame.transform.scale( esquina_sup_der, ( CELL_SIZE, CELL_SIZE ) )
+esquina_sup_izq = pygame.transform.scale( esquina_sup_izq, ( CELL_SIZE, CELL_SIZE ) )
+
 # Cargar las imagenes de los enemigos
 muk = [ pygame.image.load( f'enemigos/MUK_{i}.png' ) for i in range( 3 ) ]
 

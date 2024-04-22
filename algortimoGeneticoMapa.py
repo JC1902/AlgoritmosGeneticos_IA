@@ -1,96 +1,76 @@
-import numpy as np 
-import math
 import random
-from main import mapaJuego
-#-------------------------------------------------------------------------
+import numpy as np
 
+# Matriz objetivo
+target_matrix = np.array([
+    [3, 5, 1, 1, 1, 6, 6, 1, 1, 5],
+    [4, 4, 4, 4, 4, 4, 4, 4, 4, 5],
+    [1, 4, 3, 1, 1, 1, 5, 5, 3, 1],
+    [1, 4, 5, 1, 6, 6, 3, 5, 4, 1],
+    [1, 4, 5, 6, 9, 10, 6, 5, 4, 1],
+    [1, 3, 5, 6, 8, 7, 6, 5, 3, 1],
+    [1, 4, 5, 6, 3, 5, 1, 5, 4, 1],
+    [1, 3, 5, 6, 5, 3, 1, 5, 4, 1],
+    [5, 4, 6, 6, 5, 1, 1, 1, 4, 1],
+    [4, 4, 1, 1, 1, 1, 1, 1, 4, 4]
+])
 
-NUM_CROMOSOMAS = 10
-GENES_POR_CROMOSOMA = 10
-TOTAL_GENES = NUM_CROMOSOMAS * GENES_POR_CROMOSOMA
-RATIO_MUTACION = 0.1
+# Parámetros del algoritmo genético
+mutation_rate = 0.01
+generations = 1000
+max_generations_without_improvement = 100
+population_size = 100
 
-def f_deX(cromosoma):
-    return sum((i + 1) * valor for i, valor in enumerate(cromosoma)) + 50
+def fitness(individual):
+    return np.sum(individual == target_matrix)
 
-def fitness(fx):
-    return 1 / (1 + fx)
+def roulette_selection(population, fitness_values):
+    total_fitness = sum(fitness_values)
+    pick = random.uniform(0, total_fitness)
+    current = 0
+    for i, ind in enumerate(population):
+        current += fitness_values[i]
+        if current > pick:
+            return ind
 
-def generar_cromosomas_iniciales():
-    return mapaJuego
+def create_individual():
+    return np.random.randint(1, 11, size=target_matrix.shape)
 
-def calcular_fitnesses(cromosomas):
-    fxs = [f_deX(cromosoma) for cromosoma in cromosomas]
-    total_fitness = sum(fitness(fx) for fx in fxs)
-    return [fitness(fx) / total_fitness for fx in fxs]
+# Algoritmo genético
+current_matrix = create_individual()
 
-def seleccionar_nuevas_posiciones(probabilidades):
-    acumulaciones = [sum(probabilidades[:i+1]) for i in range(NUM_CROMOSOMAS)]
-    return [next(i+1 for i, acum in enumerate(acumulaciones) if rand < acum) for rand in [random.random() for _ in range(NUM_CROMOSOMAS)]]
+best_fitness = 0
+generations_without_improvement = 0
 
-def cruzar_cromosomas(cromosomas, nuevas_posiciones, puntos_de_corte):
-    nuevos_cromosomas = cromosomas[:]
-    for i, pos in enumerate(nuevas_posiciones):
-        if pos != i + 1 and puntos_de_corte[i] != 0:
-            punto_corte = puntos_de_corte[i]
-            cromosoma_1 = nuevos_cromosomas[i]
-            cromosoma_2 = nuevos_cromosomas[pos - 1]
-            nuevos_cromosomas[i] = cromosoma_1[:punto_corte] + cromosoma_2[punto_corte:]
-    return nuevos_cromosomas
+for generation in range(generations):
+    current_fitness = fitness(current_matrix)
+    if current_fitness == np.prod(current_matrix.shape):
+        print("Solución encontrada en la generación:", generation)
+        break
 
-def mutar_cromosomas(cromosomas, pos_mutaciones, genes_mutados):
-    for i, pos in enumerate(pos_mutaciones):
-        fila = (pos - 1) // GENES_POR_CROMOSOMA
-        columna = (pos - 1) % GENES_POR_CROMOSOMA
-        cromosomas[fila][columna] = genes_mutados[i]
-    return cromosomas
+    if current_fitness > best_fitness:
+        best_fitness = current_fitness
+        best_solution = current_matrix.copy()
+        generations_without_improvement = 0
+    else:
+        generations_without_improvement += 1
 
-def reasignar_cromosomas(cromosomas):
-    for i, cromosoma in enumerate(cromosomas):
-        globals()[f"cromosoma_{i+1}"] = cromosoma
+    if generations_without_improvement >= max_generations_without_improvement:
+        print("Se alcanzó el límite de generaciones sin mejora.")
+        break
 
-def seleccionar_mejores_cromosomas(cromosomas):
-    mejores_cromosomas = []
+    next_population = [best_solution.copy()]  # Elitismo, la mejor solución pasa directamente
+    while len(next_population) < population_size:
+        selected_individual = roulette_selection([current_matrix], [current_fitness])
+        new_individual = selected_individual.copy()
+        for i in range(new_individual.shape[0]):
+            for j in range(new_individual.shape[1]):
+                if random.random() < mutation_rate:
+                    new_individual[i][j] = random.randint(1, 10)
+        next_population.append(new_individual)
 
-    for cromosoma in cromosomas:
-        valor = abs(f_deX(cromosoma))
-        if len(mejores_cromosomas) < 10:
-            # Si aún no tenemos 10 cromosomas en la lista, simplemente agregamos este
-            mejores_cromosomas.append((cromosoma, valor))
-            # Ordenamos la lista de mejores cromosomas basados en el valor absoluto
-            mejores_cromosomas.sort(key=lambda x: x[1])
-        else:
-            # Si ya tenemos 10 cromosomas en la lista, comprobamos si este cromosoma es mejor que alguno de los existentes
-            peor_valor = max(mejores_cromosomas, key=lambda x: x[1])[1]
-            if valor < peor_valor:
-                # Si el nuevo cromosoma es mejor que el peor de los 10, lo reemplazamos
-                peor_index = mejores_cromosomas.index((max(mejores_cromosomas, key=lambda x: x[1])))
-                mejores_cromosomas[peor_index] = (cromosoma, valor)
-                # Ordenamos la lista de mejores cromosomas basados en el valor absoluto
-                mejores_cromosomas.sort(key=lambda x: x[1])
+    current_matrix = next_population[random.randint(0, population_size - 1)]  # Seleccionamos aleatoriamente una de las nuevas soluciones
 
-    return [cromosoma for cromosoma, _ in mejores_cromosomas]
-
-print("Mejor cromosoma:", seleccionar_mejores_cromosomas( generar_cromosomas_iniciales() ) )
-
-mapaJuego = seleccionar_mejores_cromosomas( generar_cromosomas_iniciales() )
-
-def algoritmo_genetico():
-    cromosomas = generar_cromosomas_iniciales()
-    fitnesses = calcular_fitnesses(cromosomas)
-    seleccionados = seleccionar_nuevas_posiciones(fitnesses)
-    puntos_de_corte = [random.randint(0, GENES_POR_CROMOSOMA) for _ in range(NUM_CROMOSOMAS)]
-    cromosomas = cruzar_cromosomas(cromosomas, seleccionados, puntos_de_corte)
-    pos_mutaciones = [random.randint(1, TOTAL_GENES) for _ in range(int(TOTAL_GENES * RATIO_MUTACION))]
-    genes_mutados = [random.randint(0, 3) for _ in range(int(TOTAL_GENES * RATIO_MUTACION))]
-    cromosomas = mutar_cromosomas(cromosomas, pos_mutaciones, genes_mutados)
-    reasignar_cromosomas(cromosomas)
-    mejores_cromosomas = seleccionar_mejores_cromosomas(cromosomas)
-    return mejores_cromosomas
-
-# Ejemplo de uso del algoritmo genético
-mapaJuego = mejores_cromosomas = algoritmo_genetico()
-for cromosoma in mejores_cromosomas:
-    print(f_deX(cromosoma))
-
-#-------------------------------------------------------------------------
+best_solution = current_matrix
+print("Mejor solución encontrada:")
+print(best_solution)
